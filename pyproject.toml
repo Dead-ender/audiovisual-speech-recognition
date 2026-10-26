@@ -20,6 +20,7 @@ dependencies = [
   "numpy>=1.24,<2.0",
   "torch>=2.2,<3.0",
   "torchaudio>=2.2,<3.0",
+  "torchcodec>=0.1",
   "opencv-python-headless>=4.8",
 ]
 

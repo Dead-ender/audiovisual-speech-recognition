@@ -43,6 +43,7 @@ Use Python 3.10 or newer. PyTorch and TorchAudio must use compatible builds. For
 ```bash
 python -m venv .venv
 # Activate the environment, then install matching torch and torchaudio builds.
+# TorchAudio 2.9+ also uses TorchCodec for audio decoding.
 python -m pip install -e ".[dev]"
 ```
 

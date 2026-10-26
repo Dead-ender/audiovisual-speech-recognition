@@ -33,6 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
     train.add_argument("--learning-rate", type=float, default=3e-4)
     train.add_argument("--num-workers", type=int, default=0)
     train.add_argument("--device", choices=("cpu", "cuda"), default=None)
+    train.add_argument("--seed", type=int, default=42, help="random seed for training (default: 42)")
 
     for name, description in (
         ("evaluate", "compute loss, CER, and WER for a labeled manifest"),
@@ -65,6 +66,7 @@ def main() -> None:
             learning_rate=args.learning_rate,
             num_workers=args.num_workers,
             device=args.device,
+            seed=args.seed,
         )
         return
 

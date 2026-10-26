@@ -17,6 +17,7 @@ A PyTorch research toolkit for experimenting with character-level audiovisual sp
 - Length-aware batching, audiovisual time alignment, Transformer fusion, CTC training, and greedy decoding.
 - Checkpoint save/load, CER/WER evaluation, unit tests, and continuous integration.
 - Original notebook retained as a small synthetic pipeline walkthrough.
+- A model card that states what is and is not evaluated, plus a practical inference guide.
 
 ## Architecture
 
@@ -77,13 +78,16 @@ avsr train \
   --validation-manifest data/validation.csv \
   --output checkpoints/avsr.pt \
   --epochs 10 \
-  --batch-size 8
+  --batch-size 8 \
+  --seed 42
 
 avsr evaluate --manifest data/test.csv --checkpoint checkpoints/avsr.pt
 avsr predict --manifest data/test.csv --checkpoint checkpoints/avsr.pt --output predictions.json
 ```
 
 Training logs loss, character error rate (CER), and word error rate (WER); it saves the checkpoint with the best validation CER and a JSON training history. The default model is intended for short, aligned utterances. Transformer self-attention cost grows quickly with sequence length, so split long recordings into utterances before training.
+
+See [the inference guide](docs/inference.md) for command-line and Python prediction examples. The [model card](MODEL_CARD.md) documents the model's status, intended use, and known limitations. No trained checkpoint or measured accuracy is included.
 
 ## Notebook
 
@@ -95,7 +99,7 @@ Open `Audiovisual Speech Recognition through Multimodal Fusion of Lip Movements 
 python -m pytest
 ```
 
-Tests cover text encoding, manifest validation, variable-length batching, model/CTC forward and backward passes, checkpoint round-trips, decoding, metrics, and notebook structure. They use generated tensors and temporary placeholder files, not a speech dataset.
+Tests cover text encoding, manifest validation, variable-length batching, model/CTC forward and backward passes, checkpoint round-trips, decoding, metrics, notebook structure, and (when TorchAudio/OpenCV media support is available) generated WAV/video through the real loader, model, and decoder. The generated media is only a pipeline smoke test: it contains no speech and must not be used as evidence of recognition quality.
 
 ## Data, privacy, and limitations
 

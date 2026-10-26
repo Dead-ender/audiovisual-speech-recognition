@@ -1,9 +1,11 @@
 """Training and evaluation loops."""
 
 import json
+import random
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -138,9 +140,15 @@ def train_model(
     learning_rate: float = 3e-4,
     num_workers: int = 0,
     device: str | None = None,
+    seed: int = 42,
 ) -> list[dict[str, float]]:
     if epochs <= 0 or batch_size <= 0:
         raise ValueError("epochs and batch_size must be positive")
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
     config = config or AVSRConfig()
     device_obj = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
     train_data = ManifestDataset(train_manifest, config)

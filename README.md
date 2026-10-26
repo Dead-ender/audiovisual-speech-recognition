@@ -38,7 +38,7 @@ Details and assumptions are documented in [the architecture notes](docs/architec
 
 ## Install
 
-Use Python 3.10 or newer. PyTorch and TorchAudio must use compatible builds. For a CUDA or CPU environment, select the matching pair with the [official PyTorch installer](https://pytorch.org/get-started/locally/), then install this project:
+Use Python 3.10 or newer. PyTorch and TorchAudio must use compatible builds. TorchCodec uses FFmpeg runtime libraries to decode WAV files in current TorchAudio releases; install FFmpeg on the system if it is not already available. For a CUDA or CPU environment, select the matching PyTorch/TorchAudio pair with the [official PyTorch installer](https://pytorch.org/get-started/locally/), then install this project:
 
 ```bash
 python -m venv .venv

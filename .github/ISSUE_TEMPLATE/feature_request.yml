@@ -1,0 +1,25 @@
+name: Feature request
+description: Suggest a scoped improvement to the research toolkit.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What research or workflow need does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: How should it be validated?
+      description: Describe tests or an evaluation protocol. Do not upload private data.
+    validations:
+      required: true

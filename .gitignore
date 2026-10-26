@@ -14,21 +14,51 @@ ENV/
 
 # Test and tooling caches
 .pytest_cache/
+.pytest-tmp/
 .mypy_cache/
 .ruff_cache/
 .coverage
 htmlcov/
 
-# Model/data artifacts (never commit datasets or checkpoints by default)
+# Datasets, media, and generated artifacts
 data/
 datasets/
 artifacts/
 checkpoints/
+outputs/
+results/
+media/
+predictions/
+logs/
 *.pt
 *.pth
 *.ckpt
 *.onnx
 *.safetensors
+*.h5
+*.hdf5
+*.keras
+*.weights.h5
+*.wav
+*.mp3
+*.mp4
+*.avi
+*.mkv
+*.npy
+*.npz
+*.history.json
+
+# Other independent portfolio projects in this shared workspace
+/Audiovisual Speech Recognition through Multimodal Fusion of Lip Movements and Audio Spectrograms/
+/cracked-surface-classification-alexnet/
+/cracked-surface-classification-resnet50/
+/cracked-surface-classification-vgg19/
+/eeg-depression-classification/
+/eeg-image-drowsiness-classification/
+/face-mask-detection-cnn/
+/medical-image-attention-experiments/
+/mnist-autoencoder-reconstruction/
+/mnist-srgan-super-resolution/
 
 # OS/editor files
 .DS_Store

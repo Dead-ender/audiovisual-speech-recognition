@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "avsr-fusion"
+version = "0.1.0"
+description = "A research toolkit for audiovisual speech-recognition experiments with CTC."
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["audiovisual speech recognition", "multimodal learning", "PyTorch", "CTC"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "numpy>=1.24,<2.0",
+  "torch>=2.2,<3.0",
+  "torchaudio>=2.2,<3.0",
+  "opencv-python-headless>=4.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+avsr = "avsr.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 96
+target-version = "py310"
+src = ["src"]

@@ -1,42 +1,104 @@
-# Audiovisual Speech Recognition Prototype
+# Audiovisual Speech Recognition
 
-A small research prototype exploring multimodal fusion for character-level speech recognition. It combines a log-Mel spectrogram audio encoder, a 3D CNN over grayscale video frames, a Transformer fusion encoder, and a CTC output layer. The implementation and runnable synthetic demo are in the notebook.
+[![CI](https://github.com/Dead-ender/audiovisual-speech-recognition/actions/workflows/ci.yml/badge.svg)](https://github.com/Dead-ender/audiovisual-speech-recognition/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Status](https://img.shields.io/badge/status-research%20prototype-orange)
 
-## Status and limitations
+A PyTorch research toolkit for experimenting with character-level audiovisual speech recognition. It pairs log-Mel audio features with grayscale video frames, encodes each stream, fuses them with a Transformer, and predicts text with CTC.
 
-This is a pipeline demonstration, not a trained speech-recognition system. Its bundled dataset is generated in memory from synthetic sine waves/noise, moving squares, and random character sequences. The inputs and labels are unrelated and contain no real speech or lip motion. There is no real-world dataset, validation protocol, benchmark, or reported accuracy. Training output from the demo must not be interpreted as recognition performance.
+> **Research status:** this repository contains a model implementation and data pipeline, not a trained speech-recognition product. No real audiovisual dataset, pretrained checkpoint, benchmark, or verified accuracy is included. The old notebook uses synthetic data only; its outputs are not recognition results.
 
-The notebook currently expects fixed-size synthetic clips and is intended for experimentation with model wiring. It does not yet include real-media preprocessing, alignment, checkpointing, evaluation metrics, or inference on user-provided recordings.
+## What is included
 
-## Requirements
+- Installable `avsr` Python package and command-line interface.
+- CSV manifest validation with relative media paths.
+- WAV loading, mono conversion, sample-rate resampling, and log-Mel features.
+- Uniform video-frame sampling and grayscale resizing from clips that are already cropped to the mouth region.
+- Length-aware batching, audiovisual time alignment, Transformer fusion, CTC training, and greedy decoding.
+- Checkpoint save/load, CER/WER evaluation, unit tests, and continuous integration.
+- Original notebook retained as a small synthetic pipeline walkthrough.
 
-- Python 3.10 or newer
-- PyTorch and TorchAudio built for the same release and compatible CPU/CUDA runtime
-- NumPy below 2.0 (needed for compatibility with older PyTorch builds)
+## Architecture
 
-For GPU installations, use the [official PyTorch installation selector](https://pytorch.org/get-started/locally/) to install matching `torch` and `torchaudio` packages for your platform. Then install the remaining requirements, or install all packages from `requirements.txt` in an environment where pip can select compatible builds.
+```mermaid
+flowchart LR
+  A[Aligned audio WAV] --> B[Log-Mel spectrogram]
+  B --> C[2D CNN audio encoder]
+  V[Mouth-region video] --> D[Sample grayscale frames]
+  D --> E[3D CNN video encoder]
+  C --> F[Time alignment and feature fusion]
+  E --> F
+  F --> G[Transformer encoder]
+  G --> H[Character logits]
+  H --> I[CTC loss / greedy decoding]
+```
+
+Details and assumptions are documented in [the architecture notes](docs/architecture.md) and [the data format guide](docs/data-format.md).
+
+## Install
+
+Use Python 3.10 or newer. PyTorch and TorchAudio must use compatible builds. For a CUDA or CPU environment, select the matching pair with the [official PyTorch installer](https://pytorch.org/get-started/locally/), then install this project:
 
 ```bash
 python -m venv .venv
-# Activate the environment, then install a matching torch/torchaudio pair.
+# Activate the environment, then install matching torch and torchaudio builds.
+python -m pip install -e ".[dev]"
+```
+
+`requirements.txt` provides the same editable development install for tools that use requirements files:
+
+```bash
 python -m pip install -r requirements.txt
 ```
 
-## Run the notebook
+## Prepare data
 
-Open `Audiovisual Speech Recognition through Multimodal Fusion of Lip Movements and Audio Spectrograms.ipynb` in Jupyter or Google Colab. The final cell leaves `RUN_DEMO = False` by default. Change it to `True` and run the cell to execute the small synthetic training demo. A GPU is optional; CPU execution may be slow.
+Create separate training and validation CSV files with these columns:
+
+```csv
+audio_path,video_path,transcript
+audio/0001.wav,video/0001.mp4,hello world
+audio/0002.wav,video/0002.mp4,turn left
+```
+
+Relative paths are resolved from the manifest's directory. Each WAV, video, and transcript must describe the same utterance. Video should contain a stable mouth-region crop; this project does not detect faces or crop lips. The default transcript alphabet supports lowercase English letters, spaces, and apostrophes. See the [data guide](docs/data-format.md) before preparing a corpus.
+
+Validate file paths and transcript characters before training:
+
+```bash
+avsr validate-manifest data/train.csv
+```
+
+## Train and evaluate
+
+```bash
+avsr train \
+  --train-manifest data/train.csv \
+  --validation-manifest data/validation.csv \
+  --output checkpoints/avsr.pt \
+  --epochs 10 \
+  --batch-size 8
+
+avsr evaluate --manifest data/test.csv --checkpoint checkpoints/avsr.pt
+avsr predict --manifest data/test.csv --checkpoint checkpoints/avsr.pt --output predictions.json
+```
+
+Training logs loss, character error rate (CER), and word error rate (WER); it saves the checkpoint with the best validation CER and a JSON training history. The default model is intended for short, aligned utterances. Transformer self-attention cost grows quickly with sequence length, so split long recordings into utterances before training.
+
+## Notebook
+
+Open `Audiovisual Speech Recognition through Multimodal Fusion of Lip Movements and Audio Spectrograms.ipynb` in Jupyter or Colab for the original model-wiring demo. It creates random audio/video/text examples in memory. It does not use speech or a real lip-reading corpus, so its loss and predictions must not be presented as ASR performance.
 
 ## Tests
 
-The lightweight tests validate notebook structure, Python syntax, and that generated cell outputs are not committed. They do not run model training or assess recognition quality.
-
 ```bash
-python -m pip install pytest
 python -m pytest
 ```
 
-## Repository contents
+Tests cover text encoding, manifest validation, variable-length batching, model/CTC forward and backward passes, checkpoint round-trips, decoding, metrics, and notebook structure. They use generated tensors and temporary placeholder files, not a speech dataset.
 
-- `Audiovisual Speech Recognition through Multimodal Fusion of Lip Movements and Audio Spectrograms.ipynb` — model prototype and opt-in synthetic demo
-- `requirements.txt` — Python dependencies
-- `tests/` — notebook integrity checks
+## Data, privacy, and limitations
+
+This repository does not redistribute audio, video, participant data, checkpoints, or generated predictions. Use only audiovisual data that you have permission to process. Voice and face recordings can be identifying biometric data; obtain appropriate consent and follow the dataset's license and privacy rules.
+
+The default implementation is an educational baseline. It has no speaker-independent evaluation protocol, production preprocessing, beam-search decoder, pretrained weights, or evidence of real-world accuracy. Results depend on the dataset, alignment, speaker split, and training setup. See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidance.

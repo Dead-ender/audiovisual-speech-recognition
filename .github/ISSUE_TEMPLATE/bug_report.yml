@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible problem in the code or documentation.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not attach private recordings, participant data, checkpoints, or credentials."
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+      description: Include the command and a short error message with private paths removed.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Python, PyTorch, TorchAudio, OS, and CPU/CUDA versions.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Use synthetic or redistributable data only.
+    validations:
+      required: true

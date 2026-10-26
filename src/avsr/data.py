@@ -1,9 +1,10 @@
 """CSV manifests and paired audio/video loading."""
 
 import csv
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 import numpy as np
 import torch
